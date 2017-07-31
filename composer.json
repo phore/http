@@ -1,0 +1,37 @@
+{
+    "name": "phore/http",
+    "type": "library",
+    "description": "Fluent Http cURL wrapper",
+    "keywords": ["cURL", "http", "url", ""],
+    "homepage": "http://github.com/phore/http",
+    "license": "Proprietary",
+    "authors": [
+        {
+            "name": "Matthias Leuffen",
+            "email": "matthes@leuffen.de"
+        }
+    ],
+
+
+    "require": {
+        "php": ">=7.0",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "nette/tester": "*",
+        "symfony/yaml": "*"
+    },
+    "suggest": {
+        "symfony/yaml": "Allows usage of file($name)->yaml()",
+        "ext-xml": "Needed to support XML format in class Foo"
+    },
+    "autoload": {
+        "psr-4": {
+            "Phore\\Http\\": "src/"
+        },
+        "files": [
+            "src/functions.inc.php"
+        ]
+    },
+    "minimum-stability": "dev"
+}
