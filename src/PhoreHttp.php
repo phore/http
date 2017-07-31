@@ -86,26 +86,36 @@ class PhoreHttp
         return $this;
     }
 
-    public function withHeaders(array $headers) {
-
+    public function withHeaders(array $headers) : self {
+        foreach ($headers as $key => $val)
+            $this->req["requestHeader"][$key] = $val;
+        return $this;
     }
 
     public function withYaml($data) : self {
+        if ($this->req["postfields"] !== null)
+            throw new \Exception("You cannot combine POST() with with() requests: Both are being sent in request body");
         $yaml = Yaml::dump($data);
-
+        $this->req["requestHeader"]["Content-Type"] = "text/yaml";
+        $this->req["postfields"] = $yaml;
+        return $this;
     }
 
     public function withJSON($data) : self {
+        if ($this->req["postfields"] !== null)
+            throw new \Exception("You cannot combine POST() with with() requests: Both are being sent in request body");
         $json = json_encode($data);
-
+        $this->req["requestHeader"]["Content-Type"] = "text/json";
+        $this->req["postfields"] = $json;
+        return $this;
     }
 
-    public function intoYaml() : self {
-
+    public function parseYaml() : self {
+        $this->req["requestHeader"]["Accept"] = "text/yaml,text/x-yaml,application/yaml,application/x-yaml";
     }
 
-    public function intoJSON() : self {
-
+    public function parseJSON() : self {
+        $this->req["requestHeader"]["Accept"] = "text/json,application/json";
     }
 
     public function intoFile($filename) : self {
@@ -150,7 +160,7 @@ class PhoreHttp
     }
 
 
-    public function run($timeLimit=30) : self {
+    public function wait($timeLimit=30) : self {
         $ch = curl_init($this->url);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeLimit);
         curl_setopt($ch, CURLOPT_HEADER, 1);
@@ -159,7 +169,7 @@ class PhoreHttp
         if ($this->req["method"] == "POST") {
             curl_setopt($ch, CURLOPT_POSTFIELDS, 1);
             if ($this->req["postfields"] !== null)
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->req["postfields"]);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $this->req["postfields"]);
         }
 
         $onBody = false;
@@ -200,15 +210,6 @@ class PhoreHttp
             throw new \Exception("Error loading '$this->url': " . curl_error($ch));
         }
         return $this;
-    }
-
-
-    public function new () {
-
-    }
-
-    public function wait($timeLimit=30, $parallel=5) {
-
     }
 
 }
